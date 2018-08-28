@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  h1 Loans
+  p
+    a.button(href='/loans/new') Create New Loan
+  p Filters
+    a(href='/loans')  All |
+    a(href='/loans/?filter=overdue')  Overdue |
+    a(href='/loans/?filter=checked_out')  Checked Out
+
+  table
+    thead
+      tr
+        th Book
+        th Patron
+        th Loaned on
+        th Return by
+        th Returned on
+        th Action
+    tbody
+      tr
+        td
+          a(href='/books/detail') Harry Potter and the Philosopher's Stone
+        td
+          a(href='/patrons/detail') Harry Potter
+        td 2018-08-28
+        td 2018-06-28
+        td 
+        td 
+          a(href='books/return') Return Book

@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  h1 Patrons
+  p
+    a.button(href='/patrons/new') Create New Patron
+
+  table
+    thead
+      tr
+        th Name
+        th Address
+        th Email
+        th Library ID
+        th Zip
+    tbody
+      tr
+        td
+          a(href='/patrons/detail') Harry Potter
+        td 4 Privet Drive
+        td harrypotter@wizardingworld.com
+        td MCL1001
+        td RG12

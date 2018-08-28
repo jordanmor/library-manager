@@ -14,8 +14,8 @@ app.set('view engine', 'pug');
 
 app.use('/', routes);
 app.use('/books', books);
-// app.use('/patrons', patrons);
-// app.use('/loans', loans);
+app.use('/patrons', patrons);
+app.use('/loans', loans);
 
 app.use((req, res, next) => {
   const err = new Error('Page Not Found');
