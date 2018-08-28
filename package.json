@@ -16,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/jordanmor/library-manager/issues"
   },
-  "homepage": "https://github.com/jordanmor/library-manager#readme"
+  "homepage": "https://github.com/jordanmor/library-manager#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "pug": "^2.0.3",
+    "sequelize": "^4.38.0",
+    "sequelize-cli": "^4.1.1",
+    "sqlite3": "^4.0.2"
+  }
 }
