@@ -10,4 +10,12 @@ router.get('/', (req, res) => {
   res.render('books/index');
 });
 
+router.get('/new', (req, res) => {
+  res.render('books/new');
+});
+
+router.get('/detail', (req, res) => {
+  res.render('books/detail');
+});
+
 module.exports = router;
