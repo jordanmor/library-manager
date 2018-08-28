@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const sequelize = require('./models').sequelize;
 
 const routes = require('./routes/index');
 const books = require('./routes/books');
@@ -29,4 +30,6 @@ app.use( (err, req, res, next) => {
   res.status(err.status).render('error');
 });
 
-app.listen(3000, () => console.log('The application is running on localhost:3000!'));
+sequelize.sync().then(() => 
+  app.listen(3000, () => console.log('The application is running on localhost:3000!'))
+);
