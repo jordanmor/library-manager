@@ -19,13 +19,14 @@ block content
         th Returned on
         th Action
     tbody
-      tr
-        td
-          a(href='/books/detail') Harry Potter and the Philosopher's Stone
-        td
-          a(href='/patrons/detail') Harry Potter
-        td 2018-08-28
-        td 2018-06-28
-        td 
-        td 
-          a.button(href='/loans/return') Return Book
+      each loan in loans
+        tr
+          td
+            a(href=`/books/${loan.Book.id}`)= loan.Book.title
+          td
+            a(href=`/patrons/${loan.Patron.id}`) #{loan.Patron.first_name} #{loan.Patron.last_name}
+          td= loan.loaned_on
+          td= loan.return_by
+          td= loan.return_on
+          td 
+            a.button(href='/loans/return') Return Book

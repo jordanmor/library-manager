@@ -8,10 +8,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     title: DataTypes.STRING,
     author: DataTypes.STRING,
+    genre: DataTypes.STRING,
     first_published: DataTypes.INTEGER
-  }, {});
+  }, {
+    timestamps: false
+  });
   Books.associate = function(models) {
-    // associations can be defined here
+    Books.hasMany(models.Loans, {foreignKey: 'book_id'});
   };
   return Books;
 };

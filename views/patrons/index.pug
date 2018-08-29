@@ -14,10 +14,12 @@ block content
         th Library ID
         th Zip
     tbody
-      tr
-        td
-          a(href='/patrons/detail') Harry Potter
-        td 4 Privet Drive
-        td harrypotter@wizardingworld.com
-        td MCL1001
-        td RG12
+      each patron in patrons
+        - const { id, first_name, last_name, address, email, library_id, zip_code } = patron;
+        tr
+          td
+            a(href=`/patrons/${id}`) #{first_name} #{last_name}
+          td= address
+          td= email
+          td= library_id
+          td= zip_code
