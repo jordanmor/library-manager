@@ -29,4 +29,5 @@ block content
           td= loan.return_by
           td= loan.returned_on
           td
-            a.button(href='/loans/return') Return Book
+            if !loan.returned_on
+              a.button(href='/loans/return') Return Book

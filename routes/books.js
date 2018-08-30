@@ -53,12 +53,21 @@ router.get('/', (req, res) => {
 
 
 router.get('/new', (req, res) => {
-  res.render('books/new', {book: Books.build()});
+  res.render('books/new', { book: Books.build() });
 });
 
 router.post('/new', (req, res) => {
   Books.create(req.body)
-    .then( book => res.redirect('/books'));
+    .then( book => res.redirect('/books'))
+    .catch(err => {
+      if (err.name === 'SequelizeValidationError') {
+        res.render("books/new", {
+          book: Books.build(req.body), 
+          errors: err.errors
+        });
+      } else {throw err;}
+    })
+    .catch(err => res.sendStatus(500));
 });
 
 // GET individual book
