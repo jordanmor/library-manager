@@ -3,13 +3,54 @@ const router = express.Router();
 const Books = require('../models').Books;
 const Patrons = require('../models').Patrons;
 const Loans = require('../models').Loans;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 // GET all books
 router.get('/', (req, res) => {
-  Books.findAll()
+
+  if (req.query.filter === 'overdue') {
+
+    Books.findAll({
+      include: [{
+        model: Loans,
+        where: {
+          loaned_on: {
+            [Op.ne]: null
+          },
+          return_by: {
+            [Op.lt]: new Date()
+          },
+          returned_on: null
+        }
+      }]
+    })
     .then(books => res.render('books/index', {books: books}))
     .catch(err => res.sendStatus(500));
+
+  } else if (req.query.filter === 'checked_out'){
+      Books.findAll({
+        include: [{
+          model: Loans,
+          where: {
+            loaned_on: {
+              [Op.ne]: null
+            },
+            returned_on: null
+          }
+        }]
+      })
+      .then(books => res.render('books/index', {books: books}))
+      .catch(err => res.sendStatus(500));
+
+  } else {
+
+      Books.findAll()
+      .then(books => res.render('books/index', {books: books}))
+      .catch(err => res.sendStatus(500));
+  }
 });
+
 
 router.get('/new', (req, res) => {
   res.render('books/new');
