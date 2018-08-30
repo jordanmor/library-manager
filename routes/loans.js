@@ -1,18 +1,57 @@
 const express = require('express');
 const router = express.Router();
 const Loans = require('../models').Loans;
-// const Books = require('../models').Books;
-// const Patrons = require('../models').Patrons;
+const Books = require('../models').Books;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
-// GET all books
+// GET all loans / overdue loans / checked out loans
 router.get('/', (req, res) => {
-  Loans.findAll({
-    include: [{
-      all: true 
-      }]
+
+  if (req.query.filter === 'overdue') {
+
+    Loans.findAll({
+      include: [{
+        all: true
+      }],
+      where: {
+        loaned_on: {
+          [Op.ne]: null
+        },
+        return_by: {
+          [Op.lt]: new Date()
+        },
+        returned_on: null
+      }
     })
     .then(loans => res.render('loans/index', {loans: loans}))
     .catch(err => res.sendStatus(500));
+
+  } else if (req.query.filter === 'checked_out'){
+      Loans.findAll({
+        include: [{
+          all: true
+        }],
+        where: {
+          loaned_on: {
+            [Op.ne]: null
+          },
+          returned_on: null
+        }
+      })
+      .then(loans => res.render('loans/index', {loans: loans}))
+      .catch(err => res.sendStatus(500));
+
+  } else {
+
+    Loans.findAll({
+      include: [{
+        all: true 
+        }]
+      })
+      .then(loans => res.render('loans/index', {loans: loans}))
+      .catch(err => res.sendStatus(500));
+  }
 });
 
 router.get('/new', (req, res) => {
