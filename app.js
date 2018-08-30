@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const sequelize = require('./models').sequelize;
+const methodOverride = require('method-override');
 
 const routes = require('./routes/index');
 const books = require('./routes/books');
@@ -9,6 +10,7 @@ const loans = require('./routes/loans');
 
 const app = express();
 
+app.use(methodOverride('_method'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
