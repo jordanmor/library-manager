@@ -6,7 +6,7 @@ const Loans = require('../models').Loans;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-// GET all books
+// GET all books / overdue books / checked out books
 router.get('/', (req, res) => {
 
   if (req.query.filter === 'overdue') {
@@ -51,11 +51,12 @@ router.get('/', (req, res) => {
   }
 });
 
-
+// Create a new book form
 router.get('/new', (req, res) => {
   res.render('books/new', { book: Books.build() });
 });
 
+// POST create book
 router.post('/new', (req, res) => {
   Books.create(req.body)
     .then( book => res.redirect('/books'))
@@ -81,21 +82,56 @@ router.get("/:id", (req, res) => {
         }]
       }]
     })
-    .then( book => 
-      book ? res.render('books/detail', {book: book}) : res.sendStatus(404))
+    .then( book => {
+      if (book) {
+        res.render('books/detail', { 
+          form: book, 
+          book: book, 
+          loans: book.Loans 
+        })
+      } else {
+        res.sendStatus(404)
+      }
+    })
     .catch(err => res.sendStatus(500));
 });
 
-router.get('/detail', (req, res) => {
-  res.render('books/detail');
-});
+// PUT update book
+router.put("/:id", (req, res) => {
+  Books.findById(req.params.id)
+    .then(book => book.update(req.body))
+    .then(book => res.redirect('/books'))
+    .catch(err => {
 
-/* Edit article form. */
-// router.get("/:id/edit", (req, res) => {
-//   Article.findById(req.params.id)
-//     .then(article =>
-//       article ? res.render("articles/edit", {article: article, title: "Edit Article"}) : res.sendStatus(404))
-//     .catch(err => res.sendStatus(500));
-// });
+      if (err.name === 'SequelizeValidationError') {
+        const updatedBook = Books.build(req.body);
+        updatedBook.id = req.params.id;
+
+        Books.findById(req.params.id, {
+          include: [{
+            model: Loans, 
+              include: [{
+                model: Patrons
+              }]
+            }]
+          })
+          .then( book => {
+            if (book) {
+              res.render('books/detail', { 
+                form: updatedBook, 
+                book: book, 
+                loans: book.Loans, 
+                errors: err.errors 
+              })
+            } else {
+              res.sendStatus(404)
+            }
+          })
+          .catch(err => res.sendStatus(500));
+
+      } else {throw err;}
+    })
+    .catch(err => res.sendStatus(500));
+});
 
 module.exports = router;

@@ -3,19 +3,22 @@ extends ../layout
 block content
   - const { id, title, author, genre, first_published } = book;
   h1 Book: #{title}
-  form
+
+  include ../includes/errors
+
+  form(action=`/books/${form.id}?_method=PUT`, method='post')
     p
       label(for='title') title
-      input#title(type='text' value=`${title}`)
+      input#title(type='text' name='title' value=form.title)
     p
       label(for='author') Author
-      input#author(type='text' value=`${author}`)
+      input#author(type='text' name='author' value=form.author)
     p
       label(for='genre') Genre
-      input#genre(type='text' value=`${genre}`)
+      input#genre(type='text' name='genre' value=form.genre)
     p
       label(for='first_published') First Published
-      input#first_published(type='text' value=`${first_published}`)
+      input#first_published(type='text' name='first_published' value=form.first_published)
     p
       input(type='submit' value='Update')
   h2 Loan History
@@ -29,14 +32,16 @@ block content
         th Returned on
         th Action
     tbody
-      each loan in book.Loans
+      each loan in loans
+        -const { loaned_on, return_by, returned_on, Patron } = loan;
         tr
           td
             a(href=`/books/${book.id}`)= book.title
           td
-            a(href=`/patrons/${loan.Patron.id}`) #{loan.Patron.first_name} #{loan.Patron.last_name}
-          td= loan.loaned_on
-          td= loan.return_by
-          td= loan.returned_on
+            a(href=`/patrons/${Patron.id}`) #{Patron.first_name} #{Patron.last_name}
+          td= loaned_on
+          td= return_by
+          td= returned_on
           td
-            a.button(href='/books/return') Return Book
+            if !returned_on
+              a.button(href='/books/return') Return Book
