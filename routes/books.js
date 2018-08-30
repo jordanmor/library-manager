@@ -53,7 +53,12 @@ router.get('/', (req, res) => {
 
 
 router.get('/new', (req, res) => {
-  res.render('books/new');
+  res.render('books/new', {book: Books.build()});
+});
+
+router.post('/new', (req, res) => {
+  Books.create(req.body)
+    .then( book => res.redirect('/books'));
 });
 
 // GET individual book

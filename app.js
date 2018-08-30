@@ -9,8 +9,8 @@ const loans = require('./routes/loans');
 
 const app = express();
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'pug');
