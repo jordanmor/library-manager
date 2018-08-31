@@ -1,22 +1,23 @@
 extends ../layout
 
 block content
+  -const { loaned_on, return_by, Book, Patron } = loan;
   h1 Patron: Return Book
 
   include ../includes/errors
   
   p
     strong Book Title: 
-    | #{loan.Book.title}
+    | #{Book.title}
   p
     strong Loaned By: 
-    | #{loan.Patron.first_name} #{loan.Patron.last_name}
+    | #{Patron.first_name} #{Patron.last_name}
   p
     strong Loaned On: 
-    | #{loan.loaned_on}
+    | #{loaned_on}
   p
     strong Return By: 
-    | #{loan.return_by}
+    | #{return_by}
 
   form(action=`/loans/${loan.id}/return?_method=PUT` method='post')
     p
