@@ -109,3 +109,11 @@ input[type=text], select {
 .pagination-cell .button:first-of-type {
   margin-left: 0;
 }
+
+.pagination-cell .button.active {
+  background-color: #019875;
+}
+
+.pagination-cell .button.active:hover {
+  background-color: #01b189;
+}

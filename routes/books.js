@@ -4,15 +4,14 @@ const Books = require('../models').Books;
 const Patrons = require('../models').Patrons;
 const Loans = require('../models').Loans;
 const Sequelize = require('sequelize');
-const paginate = require('../utilities/paginate');
-const calculateOffset = require('../utilities/calculateOffset');
+const { paginate, setActivePage, setOffset } = require('../utilities/paginate');
 const Op = Sequelize.Op;
 const pageLimit = 5;
 
 // GET all books
 router.get('/', (req, res) => {
 
-  const offset = calculateOffset(req.query.page, pageLimit);
+  const offset = setOffset(req.query.page, pageLimit);
 
   Books.findAndCountAll({
     limit: pageLimit,
@@ -21,6 +20,7 @@ router.get('/', (req, res) => {
   .then(result => {
     const pageUrl = '/books';
     const pages = paginate(result.count, pageLimit);
+    setActivePage(pages, req.query.page);
     res.render('books/index', {
       pageUrl,
       pages,
@@ -33,7 +33,7 @@ router.get('/', (req, res) => {
 // GET overdue books
 router.get('/overdue', (req, res) => {
 
-  const offset = calculateOffset(req.query.page, pageLimit);
+  const offset = setOffset(req.query.page, pageLimit);
 
   Books.findAndCountAll({
     include: [{
@@ -54,6 +54,7 @@ router.get('/overdue', (req, res) => {
   .then(result => {
     const pageUrl = '/books/overdue';
     const pages = paginate(result.count, pageLimit);
+    setActivePage(pages, req.query.page);
     res.render('books/index', {
       pageUrl,
       pages,
@@ -66,7 +67,7 @@ router.get('/overdue', (req, res) => {
 // GET checked out books
 router.get('/checked_out', (req, res) => {
 
-  const offset = calculateOffset(req.query.page, pageLimit);
+  const offset = setOffset(req.query.page, pageLimit);
 
   Books.findAndCountAll({
     include: [{
@@ -84,6 +85,7 @@ router.get('/checked_out', (req, res) => {
   .then(result => {
     const pageUrl = '/books/checked_out';
     const pages = paginate(result.count, pageLimit);
+    setActivePage(pages, req.query.page);
     res.render('books/index', {
       pageUrl,
       pages,

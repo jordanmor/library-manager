@@ -1,4 +1,7 @@
 div
   if pages.length !== 1
     each page in pages
-      a.button(href=`${pageUrl}?page=${page}`)= page
+      if page.active
+        a.button.active(href=`${pageUrl}?page=${page.number}`)= page.number
+      else
+        a.button(href=`${pageUrl}?page=${page.number}`)= page.number

@@ -3,14 +3,13 @@ const router = express.Router();
 const Patrons = require('../models').Patrons;
 const Books = require('../models').Books;
 const Loans = require('../models').Loans;
-const paginate = require('../utilities/paginate');
-const calculateOffset = require('../utilities/calculateOffset');
+const { paginate, setActivePage, setOffset } = require('../utilities/paginate');
 const pageLimit = 5;
 
 // GET all patrons
 router.get('/', (req, res) => {
 
-  const offset = calculateOffset(req.query.page, pageLimit);
+  const offset = setOffset(req.query.page, pageLimit);
 
   Patrons.findAndCountAll({
     limit: pageLimit,
@@ -18,7 +17,8 @@ router.get('/', (req, res) => {
   })
     .then(result => {
       const pageUrl = '/patrons';
-      const pages = paginate(result.count, pageLimit);  
+      const pages = paginate(result.count, pageLimit);
+      setActivePage(pages, req.query.page);    
       res.render('patrons/index', {
         pageUrl,
         pages,
