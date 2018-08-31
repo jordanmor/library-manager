@@ -1,0 +1,4 @@
+div
+  if pages.length !== 1
+    each page in pages
+      a.button(href=`${pageUrl}?page=${page}`)= page

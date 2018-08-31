@@ -97,3 +97,15 @@ input[type=text], select {
 .errors {
   color: #c0392b;
 }
+
+.pagination-cell {
+  text-align: center;
+}
+
+.pagination-cell .button {
+  margin-left: .25rem;
+}
+
+.pagination-cell .button:first-of-type {
+  margin-left: 0;
+}
