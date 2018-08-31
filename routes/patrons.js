@@ -42,8 +42,53 @@ router.get("/:id", (req, res) => {
         }]
       }]
     })
-    .then( patron => 
-      patron ? res.render('patrons/detail', {patron: patron}) : res.sendStatus(404))
+    .then( patron => {
+      if (patron) {
+        res.render('patrons/detail', {
+          form: patron,
+          patron: patron,
+          loans: patron.Loans
+        })
+      }
+    })
+    .catch(err => res.sendStatus(500));
+});
+
+// PUT update book
+router.put("/:id", (req, res) => {
+  Patrons.findById(req.params.id)
+    .then(patron => patron.update(req.body))
+    .then(patron => res.redirect('/patrons'))
+    .catch(err => {
+
+      if (err.name === 'SequelizeValidationError') {
+        const updatedPatron = Patrons.build(req.body);
+        updatedPatron.id = req.params.id;
+
+        Patrons.findById(req.params.id, {
+          include: [{
+            model: Loans, 
+              include: [{
+                model: Books
+              }]
+            }]
+          })
+          .then( patron => {
+            if (patron) {
+              res.render('patrons/detail', { 
+                form: updatedPatron,
+                patron: patron,
+                loans: patron.Loans,
+                errors: err.errors 
+              })
+            } else {
+              res.sendStatus(404)
+            }
+          })
+          .catch(err => res.sendStatus(500));
+
+      } else {throw err;}
+    })
     .catch(err => res.sendStatus(500));
 });
 

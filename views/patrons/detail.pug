@@ -1,29 +1,33 @@
 extends ../layout
 
 block content
-  - const { first_name, last_name, address, email, library_id, zip_code } = patron;
+  - const { first_name, last_name } = patron;
   h1 Patron: #{first_name} #{last_name}
-  form
+
+  include ../includes/errors
+
+  form(action=`/patrons/${form.id}?_method=PUT`, method='post')
     p
       label(for='first_name') First Name
-      input#first_name(type='text' value=first_name)
+      input#first_name(type='text' name='first_name' value=form.first_name)
     p
       label(for='last_name') Last Name
-      input#last_name(type='text' value=last_name)
+      input#last_name(type='text' name='last_name' value=form.last_name)
     p
       label(for='address')  Address
-      input#address(type='text' value=address)
+      input#address(type='text' name='address' value=form.address)
     p
       label(for='email') Email
-      input#email(type='text' value=email)
+      input#email(type='text' name='email' value=form.email)
     p
       label(for='library_id') Library ID
-      input#library_id(type='text' value=library_id)
+      input#library_id(type='text' name='library_id' value=form.library_id)
     p
       label(for='zip_code') Zip Code
-      input#zip_code(type='text' value=zip_code)
+      input#zip_code(type='text' name='zip_code' value=form.zip_code)
     p
       input(type='submit' value='Update')
+
   h2 Loan History
   table
     thead
@@ -35,12 +39,12 @@ block content
         th Returned on
         th Action
     tbody
-      each loan in patron.Loans
+      each loan in loans
         tr
           td
             a(href=`/books/${loan.Book.id}`)= loan.Book.title
           td
-            a(href=`/patron/${patron.id}`) #{patron.first_name} #{patron.last_name}
+            a(href=`/patrons/${patron.id}`) #{patron.first_name} #{patron.last_name}
           td= loan.loaned_on
           td= loan.return_by
           td= loan.returned_on

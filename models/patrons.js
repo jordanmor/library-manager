@@ -33,8 +33,8 @@ module.exports = (sequelize, DataTypes) => {
     email: {
       type: DataTypes.STRING,
       validate: {
-        notEmpty: {
-          msg: 'Email is required'
+        isEmail: {
+          msg: 'Please enter a valid email'
         }
       }
     },
@@ -49,8 +49,9 @@ module.exports = (sequelize, DataTypes) => {
     zip_code: {
       type: DataTypes.INTEGER,
       validate: {
-        notEmpty: {
-          msg: 'Zip code is required'
+        is: {
+          args: ["^[0-9]{5}$"],
+          msg: 'Please enter a valid 5 digit zip code'
         }
       }
     }

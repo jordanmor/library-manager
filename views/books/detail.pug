@@ -1,8 +1,7 @@
 extends ../layout
 
 block content
-  - const { id, title, author, genre, first_published } = book;
-  h1 Book: #{title}
+  h1 Book: #{book.title}
 
   include ../includes/errors
 
