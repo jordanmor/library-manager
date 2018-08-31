@@ -120,10 +120,7 @@ router.post('/new', (req, res) => {
 });
 
 router.get('/:id/return', (req, res) => {
-  Loans.findOne({
-    where: {
-      id: req.params.id
-    },
+  Loans.findById(req.params.id, {
     include: [{
       all: true 
       }]
@@ -133,6 +130,26 @@ router.get('/:id/return', (req, res) => {
       res.render('loans/return', {loan: loan, date: now})
     })
     .catch(err => res.sendStatus(500));
+});
+
+// PUT update loan
+router.put('/:id/return', (req, res) => {
+  Loans.findById(req.params.id)
+    .then(loan => loan.update(req.body))
+    .then(loan => res.redirect('/loans'))
+    .catch(err => {
+      if (err.name === 'SequelizeValidationError') {
+        Loans.findById(req.params.id, {
+          include: [{
+            all: true 
+            }]
+          })
+          .then(loan => {
+            res.render('loans/return', {loan: loan, errors: err.errors})
+          })
+          .catch(err => res.sendStatus(500));
+      }
+    });
 });
 
 module.exports = router;
