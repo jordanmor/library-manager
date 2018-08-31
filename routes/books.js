@@ -4,51 +4,93 @@ const Books = require('../models').Books;
 const Patrons = require('../models').Patrons;
 const Loans = require('../models').Loans;
 const Sequelize = require('sequelize');
+const paginate = require('../utilities/paginate');
+const calculateOffset = require('../utilities/calculateOffset');
 const Op = Sequelize.Op;
+const pageLimit = 5;
 
-// GET all books / overdue books / checked out books
+// GET all books
 router.get('/', (req, res) => {
 
-  if (req.query.filter === 'overdue') {
+  const offset = calculateOffset(req.query.page, pageLimit);
 
-    Books.findAll({
-      include: [{
-        model: Loans,
-        where: {
-          loaned_on: {
-            [Op.ne]: null
-          },
-          return_by: {
-            [Op.lt]: new Date()
-          },
-          returned_on: null
-        }
-      }]
+  Books.findAndCountAll({
+    limit: pageLimit,
+    offset: offset
+  })
+  .then(result => {
+    const pageUrl = '/books';
+    const pages = paginate(result.count, pageLimit);
+    res.render('books/index', {
+      pageUrl,
+      pages,
+      books: result.rows
     })
-    .then(books => res.render('books/index', {books: books}))
-    .catch(err => res.sendStatus(500));
+  })
+  .catch(err => res.sendStatus(500));
+});
 
-  } else if (req.query.filter === 'checked_out'){
-      Books.findAll({
-        include: [{
-          model: Loans,
-          where: {
-            loaned_on: {
-              [Op.ne]: null
-            },
-            returned_on: null
-          }
-        }]
-      })
-      .then(books => res.render('books/index', {books: books}))
-      .catch(err => res.sendStatus(500));
+// GET overdue books
+router.get('/overdue', (req, res) => {
 
-  } else {
+  const offset = calculateOffset(req.query.page, pageLimit);
 
-      Books.findAll()
-      .then(books => res.render('books/index', {books: books}))
-      .catch(err => res.sendStatus(500));
-  }
+  Books.findAndCountAll({
+    include: [{
+      model: Loans,
+      where: {
+        loaned_on: {
+          [Op.ne]: null
+        },
+        return_by: {
+          [Op.lt]: new Date()
+        },
+        returned_on: null
+      }
+    }],
+    limit: pageLimit,
+    offset: offset
+  })
+  .then(result => {
+    const pageUrl = '/books/overdue';
+    const pages = paginate(result.count, pageLimit);
+    res.render('books/index', {
+      pageUrl,
+      pages,
+      books: result.rows
+    })
+  })
+  .catch(err => res.sendStatus(500));
+});
+
+// GET checked out books
+router.get('/checked_out', (req, res) => {
+
+  const offset = calculateOffset(req.query.page, pageLimit);
+
+  Books.findAndCountAll({
+    include: [{
+      model: Loans,
+      where: {
+        loaned_on: {
+          [Op.ne]: null
+        },
+        returned_on: null
+      }
+    }],
+    limit: pageLimit,
+    offset: offset
+  })
+  .then(result => {
+    const pageUrl = '/books/checked_out';
+    const pages = paginate(result.count, pageLimit);
+    res.render('books/index', {
+      pageUrl,
+      pages,
+      books: result.rows
+    })
+  })
+  .catch(err => res.sendStatus(500));
 });
 
 // Create a new book form
