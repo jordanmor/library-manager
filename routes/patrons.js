@@ -11,8 +11,24 @@ router.get('/', (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
+// Create a new patron form
 router.get('/new', (req, res) => {
-  res.render('patrons/new');
+  res.render('patrons/new', { patron: Patrons.build() });
+});
+
+// POST create patron
+router.post('/new', (req, res) => {
+  Patrons.create(req.body)
+    .then(patrons => res.redirect('/patrons'))
+    .catch(err => {
+      if(err.name === 'SequelizeValidationError') {
+        res.render('patrons/new', {
+          patron: Patrons.build(req.body),
+          errors: err.errors
+        })
+      } else {throw err;}
+    })
+    .catch(err => res.sendStatus(500));
 });
 
 // GET individual patron
