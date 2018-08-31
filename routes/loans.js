@@ -119,8 +119,20 @@ router.post('/new', (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
-router.get('/return', (req, res) => {
-  res.render('loans/return');
+router.get('/:id/return', (req, res) => {
+  Loans.findOne({
+    where: {
+      id: req.params.id
+    },
+    include: [{
+      all: true 
+      }]
+    })
+    .then(loan => {
+      const now = moment().format('YYYY-MM-DD');
+      res.render('loans/return', {loan: loan, date: now})
+    })
+    .catch(err => res.sendStatus(500));
 });
 
 module.exports = router;
