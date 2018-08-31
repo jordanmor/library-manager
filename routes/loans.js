@@ -65,18 +65,58 @@ router.get('/new', (req, res) => {
       const now = moment().format('YYYY-MM-DD');
       const nextWeek = moment().add(7, 'days').format('YYYY-MM-DD');
       res.render('loans/new', {
+        loan: Loans.build(),
         books: results[0],
         patrons: results[1],
-        date: now,
-        nextWeek: nextWeek
+        loaned_on: now,
+        return_by: nextWeek
       });
     })
     .catch(err => res.sendStatus(500));
 });
 
 router.post('/new', (req, res) => {
-  console.log(req.body);
-  res.redirect('/loans');
+  Loans.create(req.body)
+    .then(loan => res.redirect('/loans'))
+    .catch(err => {
+      if (err.name === 'SequelizeValidationError') {
+
+        const booksPromise = Books.findAll();
+        const patronsPromise = Patrons.findAll();
+        Promise.all([booksPromise, patronsPromise])
+          .then( results => {
+
+            const books = results[0].map(book => {
+              const { id, title } = book;
+              if(book.id == req.body.book_id) {
+                return { id, title, selected: true };
+              } else {
+                return { id, title };
+              }
+            });
+
+            const patrons = results[1].map(patron => {
+              const { id, first_name, last_name } = patron;
+              if(patron.id == req.body.patron_id) {
+                return { id, first_name, last_name, selected: true };
+              } else {
+                return { id, first_name, last_name };
+              }
+            });
+
+            res.render('loans/new', {
+              loan: Loans.build(),
+              books: books,
+              patrons: patrons,
+              loaned_on: req.body.loaned_on,
+              return_by: req.body.return_by,
+              errors: err.errors
+          });
+        })
+        .catch(err => res.sendStatus(500));
+      }  
+    })
+    .catch(err => res.sendStatus(500));
 });
 
 router.get('/return', (req, res) => {
