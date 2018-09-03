@@ -94,6 +94,10 @@ input[type=text], select {
   margin-left: 10px;
 }
 
+a.active {
+  color: #333;
+}
+
 .errors {
   color: #c0392b;
 }
