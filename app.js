@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const sequelize = require('./models').sequelize;
 const methodOverride = require('method-override');
 
 const routes = require('./routes/index');
@@ -34,6 +33,4 @@ app.use( (err, req, res, next) => {
   res.status(err.status).render('error');
 });
 
-sequelize.sync().then(() => 
-  app.listen(3000, () => console.log('The application is running on localhost:3000!'))
-);
+module.exports = app;
