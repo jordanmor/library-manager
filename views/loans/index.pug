@@ -1,9 +1,10 @@
 extends ../layout
 
 block content
-  h1 Loans
-  p
+  div.title-header
+    h1 Loans
     a.button(href='/loans/new') Create New Loan
+
   p#filters Filters
     a(href='/loans')  All |
     a(href='/loans/overdue')  Overdue |

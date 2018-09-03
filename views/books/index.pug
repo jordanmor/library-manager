@@ -1,13 +1,15 @@
 extends ../layout
 
 block content
-  h1 Books
-  p
+  div.title-header
+    h1 Books
     a.button(href='/books/new') Create New Book
   p#filters Filters
     a(href='/books')  All |
     a(href='/books/overdue')  Overdue |
     a(href='/books/checked_out')  Checked Out
+
+  include ../includes/search
 
   table
     thead

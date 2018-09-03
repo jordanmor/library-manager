@@ -24,7 +24,8 @@ router.get('/', (req, res) => {
     res.render('books/index', {
       pageUrl,
       pages,
-      books: result.rows
+      books: result.rows,
+      list: 'books'
     })
   })
   .catch(err => res.sendStatus(500));
@@ -58,7 +59,8 @@ router.get('/overdue', (req, res) => {
     res.render('books/index', {
       pageUrl,
       pages,
-      books: result.rows
+      books: result.rows,
+      list: 'books'
     })
   })
   .catch(err => res.sendStatus(500));
@@ -89,7 +91,8 @@ router.get('/checked_out', (req, res) => {
     res.render('books/index', {
       pageUrl,
       pages,
-      books: result.rows
+      books: result.rows,
+      list: 'books'
     })
   })
   .catch(err => res.sendStatus(500));

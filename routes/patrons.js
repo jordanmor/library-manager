@@ -22,7 +22,8 @@ router.get('/', (req, res) => {
       res.render('patrons/index', {
         pageUrl,
         pages,
-        patrons: result.rows
+        patrons: result.rows,
+        list: 'patrons'
       })
     })
     .catch(err => res.sendStatus(500));
