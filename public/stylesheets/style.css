@@ -123,6 +123,10 @@ a.active-link {
   color: #c0392b;
 }
 
+.errors-bd {
+  border: 2px solid #c0392b;
+}
+
 .pagination-cell {
   text-align: center;
 }
