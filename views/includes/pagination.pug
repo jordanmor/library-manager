@@ -1,7 +1,14 @@
+- const { pages, query } = pagination;
 div
-  if pages.length !== 1
+  if pages.length > 1
     each page in pages
       if page.active
-        a.button.active(href=`${pageUrl}?page=${page.number}`)= page.number
+        if query
+          a.button.active(href=`${pageUrl}?${query}page=${page.number}`)= page.number
+        else
+          a.button.active(href=`${pageUrl}?page=${page.number}`)= page.number
       else
-        a.button(href=`${pageUrl}?page=${page.number}`)= page.number
+        if query
+          a.button(href=`${pageUrl}?${query}page=${page.number}`)= page.number
+        else
+          a.button(href=`${pageUrl}?page=${page.number}`)= page.number

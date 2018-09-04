@@ -1,12 +1,3 @@
-function paginate(totalItems, pageLimit) {
-  const pages = Math.ceil(totalItems / pageLimit);
-  let pagesArray = [];
-  for(let x = 1; x <= pages; x++) {
-    pagesArray.push({number: x});
-  }
-  return pagesArray;
-};
-
 function setActivePage(pages, activePage) {
   if (!activePage) {
     pages[0].active = true;
@@ -15,16 +6,27 @@ function setActivePage(pages, activePage) {
   }
 }
 
-function setOffset(pageNum, pageLimit) {
+function paginate(totalItems, pageLimit, currentPage) {
+  const pageCount = Math.ceil(totalItems / pageLimit);
+  let pages = [];
+  for(let x = 1; x <= pageCount; x++) {
+    pages.push({number: x});
+  }
+  if ( pages.length ) {
+    setActivePage(pages, currentPage);
+  }
+  return pages;
+};
+
+function setOffset(currentPage, pageLimit) {
   let offset = 0;
-  if(pageNum) {
-    if(pageNum != 1) {
-      offset = (pageNum - 1) * pageLimit;
+  if(currentPage) {
+    if(currentPage != 1) {
+      offset = (currentPage - 1) * pageLimit;
     }
   }
   return offset;
 }
 
 module.exports.paginate = paginate;
-module.exports.setActivePage = setActivePage;
 module.exports.setOffset = setOffset;
