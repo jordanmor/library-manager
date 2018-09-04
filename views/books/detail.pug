@@ -7,7 +7,7 @@ block content
 
   form(action=`/books/${form.id}?_method=PUT`, method='post')
     p
-      label(for='title') title
+      label(for='title') Title
       input#title(type='text' name='title' value=form.title)
     p
       label(for='author') Author
@@ -43,4 +43,4 @@ block content
           td= returned_on
           td
             if !returned_on
-              a.button(href='/books/return') Return Book
+              a.button(href=`/loans/${loan.id}/return`) Return Book

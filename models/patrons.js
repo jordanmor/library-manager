@@ -49,9 +49,8 @@ module.exports = (sequelize, DataTypes) => {
     zip_code: {
       type: DataTypes.INTEGER,
       validate: {
-        is: {
-          args: ["^[0-9]{5}$"],
-          msg: 'Please enter a valid 5 digit zip code'
+        notEmpty: {
+          msg: 'Zip code is required'
         }
       }
     }
