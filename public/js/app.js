@@ -10,27 +10,28 @@ $( document ).ready(function() {
 
   // Error handler for search function
   $('form.search').on('submit', function(e) {
-    
-    if ($('form.search select').val() === '' || $('#searchInput').val() === '') {
+    const $searchInput = $('#searchInput');
+    const $select = $('form.search select');
+
+    if ($select.val() === '' || $searchInput.val() === '') {
+
+      e.preventDefault();
       $('.search-errors').remove();
       let html = '<div class="search-errors"><p class="errors">';
 
-      if ($('form.search select').val() === '' && $('#searchInput').val() === '') {
-        e.preventDefault();
+      if ($select.val() === '' && $searchInput.val() === '') {
         html += 'Please select a keyword and enter a search query'; 
-        $('#searchInput').addClass('errors-bd');
-      } else if ($('form.search select').val() === '') {
-        e.preventDefault();
+      } else if ($select.val() === '') {
         html += 'Please select a keyword';
-      } else if ($('#searchInput').val() === '') {
-        e.preventDefault();
+      } else if ($searchInput.val() === '') {
         html += 'Please enter a search query'; 
-        $('#searchInput').addClass('errors-bd');
       }
 
       html += '</p></div>';
+      $searchInput.addClass('errors-bd');
       $('form .search-container').before(html);
     }
+
   });
 
 });
