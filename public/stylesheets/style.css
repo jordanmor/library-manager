@@ -109,6 +109,11 @@ input[type=text], select {
   margin-left: 1.5rem;
 }
 
+a.full-list {
+  display: inline-block;
+  margin: 2rem 0;
+}
+
 
 a.active-link {
   color: #333;

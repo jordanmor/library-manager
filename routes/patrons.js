@@ -1,32 +1,65 @@
 const express = require('express');
 const router = express.Router();
-const Patrons = require('../models').Patrons;
-const Books = require('../models').Books;
-const Loans = require('../models').Loans;
-const { paginate, setActivePage, setOffset } = require('../utilities/paginate');
+const { Books, Patrons, Loans } = require('../models');
+const { paginate, setOffset } = require('../utilities/paginate');
+const { Op } = require('sequelize');
 const pageLimit = 5;
 
-// GET all patrons
+// GET all patrons / Search for patrons
 router.get('/', (req, res) => {
+  const { keyword, input, page: currentPage } = req.query;
+  const searchWasPerformed = keyword && input;
+  const offset = setOffset(currentPage, pageLimit);
 
-  const offset = setOffset(req.query.page, pageLimit);
+  if (searchWasPerformed) {
 
-  Patrons.findAndCountAll({
-    limit: pageLimit,
-    offset: offset
-  })
+    Patrons.findAndCountAll({
+      where: {
+        [keyword]: {
+          [Op.like]: `%${input}%`
+        }
+      },
+      limit: pageLimit,
+      offset: offset
+    })
     .then(result => {
-      const pageUrl = '/patrons';
-      const pages = paginate(result.count, pageLimit);
-      setActivePage(pages, req.query.page);    
-      res.render('patrons/index', {
-        pageUrl,
-        pages,
+      const templateData = {
         patrons: result.rows,
-        list: 'patrons'
-      })
+        pageUrl: '/patrons',
+        search: {
+          searchResult: true,
+          list: 'patrons'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage),
+          query: `keyword=${keyword}&input=${input}&` 
+        }
+      }
+      res.render('patrons/index', { templateData })
     })
     .catch(err => res.sendStatus(500));
+
+  } else {
+
+    Patrons.findAndCountAll({
+      limit: pageLimit,
+      offset: offset
+    })
+    .then(result => {
+      const templateData = {
+        patrons: result.rows,
+        pageUrl: '/patrons',
+        search: {
+          list: 'patrons'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage)
+        }
+      }
+      res.render('patrons/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));
+  }
 });
 
 // Create a new patron form

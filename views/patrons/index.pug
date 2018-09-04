@@ -1,6 +1,7 @@
 extends ../layout
 
 block content
+  -const { patrons, pageUrl, search, pagination } = templateData;
   div.title-header
     h1 Patrons
     a.button(href='/patrons/new') Create New Patron
@@ -16,15 +17,19 @@ block content
         th Library ID
         th Zip
     tbody
-      each patron in patrons
-        - const { id, first_name, last_name, address, email, library_id, zip_code } = patron;
+      if patrons.length
+        each patron in patrons
+          - const { id, first_name, last_name, address, email, library_id, zip_code } = patron;
+          tr
+            td
+              a(href=`/patrons/${id}`) #{first_name} #{last_name}
+            td= address
+            td= email
+            td= library_id
+            td= zip_code
+      else
         tr
-          td
-            a(href=`/patrons/${id}`) #{first_name} #{last_name}
-          td= address
-          td= email
-          td= library_id
-          td= zip_code
+          td(colspan=4) No Results
     tfoot
       tr
         td.pagination-cell(colspan=4)
