@@ -20,14 +20,18 @@ block content
         th Genre
         th Year Released
     tbody
-      each book in books
-        - const { id, title, author, genre, first_published } = book;
+      if books.length
+        each book in books
+          - const { id, title, author, genre, first_published } = book;
+          tr
+            td
+              a(href=`/books/${id}`) #{title}
+            td= author
+            td= genre
+            td= first_published
+      else
         tr
-          td
-            a(href=`/books/${id}`) #{title}
-          td= author
-          td= genre
-          td= first_published
+          td(colspan=4) No Results
     tfoot
       tr
         td.pagination-cell(colspan=4)
