@@ -1,6 +1,7 @@
 extends ../layout
 
 block content
+  - const { loan, books, patrons, loaned_on, return_by, errors } = templateData;
   h1 New Loan
 
   include ../includes/errors

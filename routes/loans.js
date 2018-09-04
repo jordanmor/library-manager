@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Loans = require('../models').Loans;
-const Books = require('../models').Books;
-const Patrons = require('../models').Patrons;
-const Sequelize = require('sequelize');
-const Op = Sequelize.Op;
+const { Books, Patrons, Loans } = require('../models');
+const { Op } = require('sequelize');
 const moment = require('moment');
 
 // GET all loans / overdue loans / checked out loans
@@ -14,16 +11,13 @@ router.get('/', (req, res) => {
       all: true 
       }]
     })
-    .then(loans => res.render('loans/index', {loans: loans}))
+    .then(loans => res.render('loans/index', {loans}))
     .catch(err => res.sendStatus(500));
 });
 
 // GET overdue loans
 router.get('/overdue', (req, res) => {
   Loans.findAll({
-    include: [{
-      all: true
-    }],
     where: {
       loaned_on: {
         [Op.ne]: null
@@ -32,48 +26,52 @@ router.get('/overdue', (req, res) => {
         [Op.lt]: new Date()
       },
       returned_on: null
-    }
+    },
+    include: [{
+      all: true
+    }]
   })
-  .then(loans => res.render('loans/index', {loans: loans}))
+  .then(loans => res.render('loans/index', {loans}))
   .catch(err => res.sendStatus(500));
 });
 
 // GET checked out loans
 router.get('/checked_out', (req, res) => {
   Loans.findAll({
-    include: [{
-      all: true
-    }],
     where: {
       loaned_on: {
         [Op.ne]: null
       },
       returned_on: null
-    }
+    },
+    include: [{
+      all: true
+    }]
   })
-  .then(loans => res.render('loans/index', {loans: loans}))
+  .then(loans => res.render('loans/index', {loans}))
   .catch(err => res.sendStatus(500));
 });
 
+// Create a new loan form
 router.get('/new', (req, res) => {
 
   const books = Books.findAll();
   const patrons = Patrons.findAll();
   Promise.all([books, patrons])
     .then( results => {
-      const now = moment().format('YYYY-MM-DD');
-      const nextWeek = moment().add(7, 'days').format('YYYY-MM-DD');
-      res.render('loans/new', {
+      const templateData = {
         loan: Loans.build(),
         books: results[0],
         patrons: results[1],
-        loaned_on: now,
-        return_by: nextWeek
-      });
+        loaned_on: moment().format('YYYY-MM-DD'),
+        return_by: moment().add(7, 'days').format('YYYY-MM-DD')
+      }
+      res.render('loans/new', { templateData })
     })
     .catch(err => res.sendStatus(500));
 });
 
+// POST create loan
 router.post('/new', (req, res) => {
   Loans.create(req.body)
     .then(loan => res.redirect('/loans'))
@@ -103,14 +101,17 @@ router.post('/new', (req, res) => {
               }
             });
 
-            res.render('loans/new', {
+            const { loaned_on, return_by } = req.body;
+
+            const templateData = {
               loan: Loans.build(),
-              books: books,
-              patrons: patrons,
-              loaned_on: req.body.loaned_on,
-              return_by: req.body.return_by,
-              errors: err.errors
-          });
+              errors: err.errors,
+              books,
+              patrons,
+              loaned_on,
+              return_by
+            }
+            res.render('loans/new', { templateData });
         })
         .catch(err => res.sendStatus(500));
       }  
@@ -118,6 +119,7 @@ router.post('/new', (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
+// Create a return form
 router.get('/:id/return', (req, res) => {
   Loans.findById(req.params.id, {
     include: [{
@@ -126,7 +128,7 @@ router.get('/:id/return', (req, res) => {
     })
     .then(loan => {
       const now = moment().format('YYYY-MM-DD');
-      res.render('loans/return', {loan: loan, date: now})
+      res.render('loans/return', {loan, date: now})
     })
     .catch(err => res.sendStatus(500));
 });
@@ -144,7 +146,8 @@ router.put('/:id/return', (req, res) => {
             }]
           })
           .then(loan => {
-            res.render('loans/return', {loan: loan, errors: err.errors})
+            const errors = err.errors;
+            res.render('loans/return', {loan, errors})
           })
           .catch(err => res.sendStatus(500));
       }
