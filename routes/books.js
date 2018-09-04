@@ -60,71 +60,158 @@ router.get('/', (req, res) => {
   }
 });
 
-// GET overdue books
+// GET overdue books / Search for overdue books
 router.get('/overdue', (req, res) => {
+  const { keyword, input, page: currentPage } = req.query;
+  const searchWasPerformed = keyword && input;
+  const offset = setOffset(currentPage, pageLimit);
+  
+  if (searchWasPerformed) {
 
-  const offset = setOffset(req.query.page, pageLimit);
-
-  Books.findAndCountAll({
-    include: [{
-      model: Loans,
+    Books.findAndCountAll({
       where: {
-        loaned_on: {
-          [Op.ne]: null
-        },
-        return_by: {
-          [Op.lt]: new Date()
-        },
-        returned_on: null
-      }
-    }],
-    limit: pageLimit,
-    offset: offset
-  })
-  .then(result => {
-    const pageUrl = '/books/overdue';
-    const pages = paginate(result.count, pageLimit);
-    setActivePage(pages, req.query.page);
-    res.render('books/index', {
-      pageUrl,
-      pages,
-      books: result.rows,
-      list: 'books'
+        [keyword]: {
+          [Op.like]: `%${input}%`
+        }
+      },
+      include: [{
+        model: Loans,
+        where: {
+          loaned_on: {
+            [Op.ne]: null
+          },
+          return_by: {
+            [Op.lt]: new Date()
+          },
+          returned_on: null
+        }
+      }],
+      limit: pageLimit,
+      offset: offset
     })
-  })
-  .catch(err => res.sendStatus(500));
+    .then(result => {
+      const templateData = {
+        books: result.rows,
+        pageUrl: '/books/overdue',
+        search: {
+          searchResult: true,
+          list: 'books'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage),
+          query: `keyword=${keyword}&input=${input}&` 
+        }
+      }
+      res.render('books/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));
+
+  } else {
+    Books.findAndCountAll({
+      include: [{
+        model: Loans,
+        where: {
+          loaned_on: {
+            [Op.ne]: null
+          },
+          return_by: {
+            [Op.lt]: new Date()
+          },
+          returned_on: null
+        }
+      }],
+      limit: pageLimit,
+      offset: offset
+    })
+    .then(result => {
+      const templateData = {
+        books: result.rows,
+        pageUrl: '/books/overdue',
+        search: {
+          list: 'books'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage)
+        }
+      }
+      res.render('books/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));
+  }
 });
 
-// GET checked out books
+// GET checked out books / Search for checked out books
 router.get('/checked_out', (req, res) => {
+  const { keyword, input, page: currentPage } = req.query;
+  const searchWasPerformed = keyword && input;
+  const offset = setOffset(currentPage, pageLimit);
 
-  const offset = setOffset(req.query.page, pageLimit);
+  if (searchWasPerformed) {
 
-  Books.findAndCountAll({
-    include: [{
-      model: Loans,
+    Books.findAndCountAll({
       where: {
-        loaned_on: {
-          [Op.ne]: null
-        },
-        returned_on: null
-      }
-    }],
-    limit: pageLimit,
-    offset: offset
-  })
-  .then(result => {
-    const pageUrl = '/books/checked_out';
-    const pages = paginate(result.count, pageLimit);
-    setActivePage(pages, req.query.page);
-    res.render('books/index', {
-      pageUrl,
-      pages,
-      books: result.rows,
-      list: 'books'
+        [keyword]: {
+          [Op.like]: `%${input}%`
+        }
+      },
+      include: [{
+        model: Loans,
+        where: {
+          loaned_on: {
+            [Op.ne]: null
+          },
+          returned_on: null
+        }
+      }],
+      limit: pageLimit,
+      offset: offset
     })
-  })
-  .catch(err => res.sendStatus(500));
+    .then(result => {
+      const templateData = {
+        books: result.rows,
+        pageUrl: '/books/checked_out',
+        search: {
+          searchResult: true,
+          list: 'books'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage),
+          query: `keyword=${keyword}&input=${input}&` 
+        }
+      }
+      res.render('books/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));
+
+  } else {
+    Books.findAndCountAll({
+      include: [{
+        model: Loans,
+        where: {
+          loaned_on: {
+            [Op.ne]: null
+          },
+          returned_on: null
+        }
+      }],
+      limit: pageLimit,
+      offset: offset
+    })
+    .then(result => {
+      const templateData = {
+        books: result.rows,
+        pageUrl: '/books/checked_out',
+        search: {
+          list: 'books'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage)
+        }
+      }
+      res.render('books/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));
+  }
 });
 
 // Create a new book form
