@@ -1,6 +1,7 @@
 extends ../layout
 
 block content
+  -const { books, pageUrl, search, pagination } = templateData;
   div.title-header
     h1 Books
     a.button(href='/books/new') Create New Book

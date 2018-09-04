@@ -1,34 +1,63 @@
 const express = require('express');
 const router = express.Router();
-const Books = require('../models').Books;
-const Patrons = require('../models').Patrons;
-const Loans = require('../models').Loans;
-const Sequelize = require('sequelize');
-const { paginate, setActivePage, setOffset } = require('../utilities/paginate');
-const Op = Sequelize.Op;
+const { Books, Patrons, Loans } = require('../models');
+const { paginate, setOffset } = require('../utilities/paginate');
+const { Op } = require('sequelize');
 const pageLimit = 5;
 
-// GET all books
+// GET all books / Search for books
 router.get('/', (req, res) => {
-
-  const offset = setOffset(req.query.page, pageLimit);
-
-  Books.findAndCountAll({
-    limit: pageLimit,
-    offset: offset
-  })
-  .then(result => {
-    const pageUrl = '/books';
-    const pages = paginate(result.count, pageLimit);
-    setActivePage(pages, req.query.page);
-    res.render('books/index', {
-      pageUrl,
-      pages,
-      books: result.rows,
-      list: 'books'
+  const { keyword, input, page: currentPage } = req.query;
+  const searchWasPerformed = keyword && input;
+  const offset = setOffset(currentPage, pageLimit);
+  
+  if (searchWasPerformed) {
+    Books.findAndCountAll({
+      where: {
+        [keyword]: {
+          [Op.like]: `%${input}%`
+        }
+      },
+      limit: pageLimit,
+      offset: offset
     })
-  })
-  .catch(err => res.sendStatus(500));
+    .then(result => {
+      const templateData = {
+        books: result.rows,
+        pageUrl: '/books',
+        search: {
+          searchResult: true,
+          list: 'books'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage),
+          query: `keyword=${keyword}&input=${input}&` 
+        }
+      }
+      res.render('books/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));
+
+  } else {
+    Books.findAndCountAll({
+      limit: pageLimit,
+      offset: offset
+    })
+    .then(result => {
+      const templateData = {
+        books: result.rows,
+        pageUrl: '/books',
+        search: {
+          list: 'books'
+        },
+        pagination: {
+          pages: paginate(result.count, pageLimit, currentPage)
+        }
+      }
+      res.render('books/index', { templateData })
+    })
+    .catch(err => res.sendStatus(500));  
+  }
 });
 
 // GET overdue books
