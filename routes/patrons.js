@@ -5,7 +5,10 @@ const { paginate, setOffset } = require('../utilities/paginate');
 const { Op } = require('sequelize');
 const pageLimit = 5;
 
-// GET all patrons / Search for patrons
+/*=============-=============-=============-=============
+        GET searched for patrons / GET all patrons
+===============-=============-=============-===========*/
+
 router.get('/', (req, res) => {
   const { keyword, input, page: currentPage } = req.query;
   const searchWasPerformed = keyword && input;
@@ -14,6 +17,7 @@ router.get('/', (req, res) => {
   if (searchWasPerformed) {
 
     Patrons.findAndCountAll({
+      // Query filtered with search keyword and input
       where: {
         [keyword]: {
           [Op.like]: `%${input}%`
@@ -40,7 +44,7 @@ router.get('/', (req, res) => {
     .catch(err => res.sendStatus(500));
 
   } else {
-
+    // When no search is performed, all patrons listed
     Patrons.findAndCountAll({
       limit: pageLimit,
       offset: offset
@@ -62,12 +66,18 @@ router.get('/', (req, res) => {
   }
 });
 
-// Create a new patron form
+/*=============-=============-=============-=============
+                Create a new patron form
+===============-=============-=============-===========*/
+
 router.get('/new', (req, res) => {
   res.render('patrons/new', { patron: Patrons.build() });
 });
 
-// POST create patron
+/*=============-=============-=============-=============
+                    POST create patron
+===============-=============-=============-===========*/
+
 router.post('/new', (req, res) => {
   Patrons.create(req.body)
     .then(patrons => res.redirect('/patrons'))
@@ -82,9 +92,12 @@ router.post('/new', (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
-// GET individual patron
+/*=============-=============-=============-=============
+                    GET individual patron
+===============-=============-=============-===========*/
+
 router.get("/:id", (req, res) => {
-  // Use nested eager loading to load all related models of a related model
+  // Use nested eager loading to load all related models of the patron model
   Patrons.findById(req.params.id, {
     include: [{
       model: Loans, 
@@ -105,7 +118,10 @@ router.get("/:id", (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
-// PUT update book
+/*=============-=============-=============-=============
+                      PUT update patron
+===============-=============-=============-===========*/
+
 router.put("/:id", (req, res) => {
   Patrons.findById(req.params.id)
     .then(patron => patron.update(req.body))
@@ -117,6 +133,7 @@ router.put("/:id", (req, res) => {
         updatedPatron.id = req.params.id;
 
         Patrons.findById(req.params.id, {
+          // Use nested eager loading to load all related models of the patron model
           include: [{
             model: Loans, 
               include: [{

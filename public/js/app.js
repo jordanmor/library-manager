@@ -8,7 +8,7 @@ $( document ).ready(function() {
   // Active filter link on books and loans page
   $(`#filters a[href="${window.location.pathname}"]`).addClass('active-link');
 
-  // Error handler for search function
+  // Error handler for search fields
   $('form.search').on('submit', function(e) {
     const $searchInput = $('#searchInput');
     const $select = $('form.search select');

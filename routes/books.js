@@ -5,14 +5,20 @@ const { paginate, setOffset } = require('../utilities/paginate');
 const { Op } = require('sequelize');
 const pageLimit = 5;
 
-// GET all books / Search for books
+
+/*=============-=============-=============-=============
+        GET searched for books / GET all books
+===============-=============-=============-===========*/
+
 router.get('/', (req, res) => {
   const { keyword, input, page: currentPage } = req.query;
   const searchWasPerformed = keyword && input;
   const offset = setOffset(currentPage, pageLimit);
   
   if (searchWasPerformed) {
+
     Books.findAndCountAll({
+      // Query filtered with search keyword and input
       where: {
         [keyword]: {
           [Op.like]: `%${input}%`
@@ -26,7 +32,7 @@ router.get('/', (req, res) => {
         books: result.rows,
         pageUrl: '/books',
         search: {
-          searchResult: true,
+          searchResult: true, // hide search div + render "Return to Full List" button
           list: 'books'
         },
         pagination: {
@@ -39,6 +45,7 @@ router.get('/', (req, res) => {
     .catch(err => res.sendStatus(500));
 
   } else {
+    // When no search is performed, all books listed
     Books.findAndCountAll({
       limit: pageLimit,
       offset: offset
@@ -60,7 +67,10 @@ router.get('/', (req, res) => {
   }
 });
 
-// GET overdue books / Search for overdue books
+/*=============-=============-=============-=============
+ GET searched for overdue books / GET all overdue books
+===============-=============-=============-===========*/
+
 router.get('/overdue', (req, res) => {
   const { keyword, input, page: currentPage } = req.query;
   const searchWasPerformed = keyword && input;
@@ -69,13 +79,17 @@ router.get('/overdue', (req, res) => {
   if (searchWasPerformed) {
 
     Books.findAndCountAll({
+      // Query filtered with search keyword and input
       where: {
         [keyword]: {
           [Op.like]: `%${input}%`
         }
       },
+      // Finds overdue books using eager loading
       include: [{
         model: Loans,
+        // Query filters: 
+        // book has a loaned_on date / return_by date is before today's date / no returned_on date
         where: {
           loaned_on: {
             [Op.ne]: null
@@ -94,7 +108,7 @@ router.get('/overdue', (req, res) => {
         books: result.rows,
         pageUrl: '/books/overdue',
         search: {
-          searchResult: true,
+          searchResult: true, // hide search div + render "Return to Full List" button
           list: 'books'
         },
         pagination: {
@@ -107,9 +121,13 @@ router.get('/overdue', (req, res) => {
     .catch(err => res.sendStatus(500));
 
   } else {
+    // When no search is performed, all overdue books listed
     Books.findAndCountAll({
+      // Finds overdue books using eager loading
       include: [{
         model: Loans,
+        // Query filters: 
+        // book has a loaned_on date / return_by date is before today's date / no returned_on date
         where: {
           loaned_on: {
             [Op.ne]: null
@@ -140,7 +158,10 @@ router.get('/overdue', (req, res) => {
   }
 });
 
-// GET checked out books / Search for checked out books
+/*=============-=============-=============-=============-=============
+    GET searched for checked out books / GET all checked out books
+===============-=============-=============-===========-=============*/
+
 router.get('/checked_out', (req, res) => {
   const { keyword, input, page: currentPage } = req.query;
   const searchWasPerformed = keyword && input;
@@ -149,12 +170,15 @@ router.get('/checked_out', (req, res) => {
   if (searchWasPerformed) {
 
     Books.findAndCountAll({
+      // Query filtered with search keyword and input
       where: {
         [keyword]: {
           [Op.like]: `%${input}%`
         }
       },
+      // Finds checked out books using eager loading
       include: [{
+        // Query filters: book has a loaned_on date / no returned_on date
         model: Loans,
         where: {
           loaned_on: {
@@ -171,7 +195,7 @@ router.get('/checked_out', (req, res) => {
         books: result.rows,
         pageUrl: '/books/checked_out',
         search: {
-          searchResult: true,
+          searchResult: true, // hide search div + render "Return to Full List" button
           list: 'books'
         },
         pagination: {
@@ -184,9 +208,12 @@ router.get('/checked_out', (req, res) => {
     .catch(err => res.sendStatus(500));
 
   } else {
+    // When no search is performed, all checked out books listed
     Books.findAndCountAll({
+      // Finds checked out books using eager loading
       include: [{
         model: Loans,
+        // Query filters: book has a loaned_on date / no returned_on date
         where: {
           loaned_on: {
             [Op.ne]: null
@@ -214,12 +241,18 @@ router.get('/checked_out', (req, res) => {
   }
 });
 
-// Create a new book form
+/*=============-=============-=============-=============
+                Create a new book form
+===============-=============-=============-===========*/
+
 router.get('/new', (req, res) => {
   res.render('books/new', { book: Books.build() });
 });
 
-// POST create book
+/*=============-=============-=============-=============
+                    POST create book
+===============-=============-=============-===========*/
+
 router.post('/new', (req, res) => {
   Books.create(req.body)
     .then( book => res.redirect('/books'))
@@ -234,9 +267,12 @@ router.post('/new', (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
-// GET individual book
+/*=============-=============-=============-=============
+                    GET individual book
+===============-=============-=============-===========*/
+
 router.get("/:id", (req, res) => {
-  // Use nested eager loading to load all related models of a related model
+  // Use nested eager loading to load all related models of the book model
   Books.findById(req.params.id, {
     include: [{
       model: Loans, 
@@ -259,7 +295,10 @@ router.get("/:id", (req, res) => {
     .catch(err => res.sendStatus(500));
 });
 
-// PUT update book
+/*=============-=============-=============-=============
+                      PUT update book
+===============-=============-=============-===========*/
+
 router.put("/:id", (req, res) => {
   Books.findById(req.params.id)
     .then(book => book.update(req.body))
@@ -271,6 +310,7 @@ router.put("/:id", (req, res) => {
         updatedBook.id = req.params.id;
 
         Books.findById(req.params.id, {
+          // Use nested eager loading to load all related models of the book model
           include: [{
             model: Loans, 
               include: [{

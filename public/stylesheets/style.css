@@ -119,6 +119,8 @@ a.active-link {
   color: #333;
 }
 
+/* ===== Errors ===== */
+
 .errors {
   color: #c0392b;
 }
@@ -126,6 +128,8 @@ a.active-link {
 .errors-bd {
   border: 2px solid #c0392b;
 }
+
+/* ===== Pagination ===== */
 
 .pagination-cell {
   text-align: center;
@@ -146,6 +150,8 @@ a.active-link {
 .pagination-cell .button.active:hover {
   background-color: #01b189;
 }
+
+/* ===== Search ===== */
 
 form.search {
   margin-top: 2rem;
