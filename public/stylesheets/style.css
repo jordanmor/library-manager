@@ -171,3 +171,7 @@ form.search select {
 form.search input[type=submit] {
   margin-left: 1rem;
 }
+
+.search-title {
+  text-transform: capitalize;
+}

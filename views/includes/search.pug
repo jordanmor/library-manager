@@ -3,7 +3,7 @@ if searchResult
     a.button.full-list(href=pageUrl) Return to Full List
 else
   form.search(method='get')
-    h3 Search #{list}
+    h3.search-title Search #{list}
     div.search-container
       select(name='keyword')
         option(value='') Keyword
