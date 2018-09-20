@@ -40,13 +40,15 @@ block content
         th Action
     tbody
       each loan in loans
+        - const { loaned_on, return_by, returned_on, Book } = loan;
         tr
           td
-            a(href=`/books/${loan.Book.id}`)= loan.Book.title
+            a(href=`/books/${Book.id}`)= Book.title
           td
             a(href=`/patrons/${patron.id}`) #{patron.first_name} #{patron.last_name}
-          td= loan.loaned_on
-          td= loan.return_by
-          td= loan.returned_on
+          td= loaned_on
+          td= return_by
+          td= returned_on
           td
-            a.button(href='/loans/return') Return Book
+            if !returned_on
+              a.button(href=`/loans/${loan.id}/return`) Return Book
