@@ -9,6 +9,9 @@ Treehouse Full Stack JavaScript Techdegree - Project 10
   - The librarian has been using a simple sqlite database and has been entering data in manually. Create a more intuitive way to handle the library's books, patrons and loans.
   - Implement a dynamic website using Express, Pug, and the SQL ORM Sequelize
 
+**Project Completed:** 09/28/2018  
+**Grade:** Exceeds Expectations
+
 ---
 **Installation Instructions:**
 1. git clone https://github.com/jordanmor/library-manager.git
